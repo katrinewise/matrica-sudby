@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Калькулятор Матрицы Судьбы</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      margin: 0;
+      background: #ffffff;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
+    .input-block {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    input, select, button {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #6c63ff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #matrix-container {
+      margin-top: 30px;
+    }
+    svg text {
+      font-family: sans-serif;
+      font-size: 16px;
+      fill: #333;
+    }
+  </style>
+</head>
+<body>
+  <h2>Рассчитай свою Матрицу Судьбы</h2>
+  <div class="input-block">
+    <input type="text" id="name" placeholder="Имя">
+    <select id="day"><option value="">День</option></select>
+    <select id="month"><option value="">Месяц</option></select>
+    <input type="number" id="year" placeholder="Год">
+    <button onclick="calculate()">Рассчитать</button>
+  </div>
+  <div id="matrix-container">
+    <!-- Сюда будет подставлена SVG-схема и значения -->
+    <p>Пока матрица не рассчитана</p>
+  </div>
+
+<script>
+  for (let i = 1; i <= 31; i++) {
+    const o = document.createElement("option");
+    o.value = i; o.text = i;
+    document.getElementById("day").appendChild(o);
+  }
+  for (let i = 1; i <= 12; i++) {
+    const o = document.createElement("option");
+    o.value = i; o.text = i;
+    document.getElementById("month").appendChild(o);
+  }
+
+  function reduceTo22(n) {
+    while (n > 22) {
+      n = n.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+    }
+    return n;
+  }
+
+  function calculate() {
+    const day = parseInt(document.getElementById("day").value);
+    const month = parseInt(document.getElementById("month").value);
+    const year = document.getElementById("year").value;
+
+    if (!day || !month || !year) {
+      alert("Пожалуйста, введите корректную дату");
+      return;
+    }
+
+    const yearSum = year.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+
+    const A = reduceTo22(day);
+    const B = reduceTo22(month);
+    const C = reduceTo22(yearSum);
+    const D = reduceTo22(A + B + C);
+    const Center = reduceTo22(A + B + C + D);
+
+    const AB = reduceTo22(A + B);
+    const BC = reduceTo22(B + C);
+    const CD = reduceTo22(C + D);
+    const DA = reduceTo22(D + A);
+    const leftInner = reduceTo22(A + Center);
+    const rightInner = reduceTo22(C + Center);
+    const bottomInner = reduceTo22(D + Center);
+    const parental = reduceTo22(A + C);
+    const karmicInner = reduceTo22(D + bottomInner);
+    const entryMoney = rightInner;
+    const entryLove = bottomInner;
+    const joint = reduceTo22(entryMoney + entryLove);
+    const moneyChannel = reduceTo22(entryMoney + joint);
+    const loveChannel = reduceTo22(entryLove + joint);
+
+    const positions = {
+      "Дата рождения": A,
+      "Месяц": B,
+      "Год": C,
+      "Карма": D,
+      "Центр": Center,
+      "Мужской род": AB,
+      "Женский род": BC,
+      "Левая нижняя": DA,
+      "Правая нижняя": CD,
+      "Вход в отношения": bottomInner,
+      "Вход в деньги": rightInner,
+      "Объединение": joint,
+      "Канал денег": moneyChannel,
+      "Канал любви": loveChannel,
+      "Родовая карма": parental,
+      "Кармическое усиление": karmicInner,
+    };
+
+    let result = '<svg viewBox="0 0 400 400" width="300" height="300">';
+    let keys = Object.keys(positions);
+    keys.forEach((key, i) => {
+      let angle = (i / keys.length) * Math.PI * 2;
+      let x = 200 + 140 * Math.cos(angle);
+      let y = 200 + 140 * Math.sin(angle);
+      result += `<circle cx="${x}" cy="${y}" r="16" fill="#fdd835"/><text x="${x - 5}" y="${y + 5}">${positions[key]}</text>`;
+    });
+    result += `<circle cx="200" cy="200" r="20" fill="#ff7043"/><text x="190" y="205">${Center}</text>`;
+    result += "</svg>";
+
+    document.getElementById("matrix-container").innerHTML = result;
+  }
+</script>
+</body>
+</html>
